@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jogos do componente</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <a href="index.html" class="back">← Componentes</a>
+      <h1 id="componentTitle">Jogos</h1>
+      <p id="componentSubtitle">Biblioteca de jogos HTML</p>
+    </div>
+    <div class="header-actions">
+      <button id="btnAddGame" class="primary">+ Adicionar jogo</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="gameGrid" class="game-grid"></div>
+  </main>
+
+  <div id="gameModal" class="modal hidden">
+    <div class="modal-card wide">
+      <button class="close" data-close="gameModal">×</button>
+      <h2>Adicionar jogo HTML</h2>
+      <label>Nome do jogo
+        <input id="gameName" placeholder="Ex.: SUPER FL WORLD">
+      </label>
+      <label>Descrição
+        <textarea id="gameDescription" placeholder="Descrição curta do jogo"></textarea>
+      </label>
+      <label>Arquivo HTML do jogo
+        <input id="gameFile" type="file" accept=".html,.htm">
+      </label>
+      <label>Capa do jogo (opcional)
+        <input id="gameCover" type="file" accept="image/*">
+      </label>
+      <div class="hint">O HTML será enviado ao Firebase Storage. Os dados do jogo ficarão no Firestore.</div>
+      <button id="saveGame" class="primary">Salvar jogo</button>
+      <div id="uploadStatus" class="status"></div>
+    </div>
+  </div>
+
+  <script type="module" src="component.js"></script>
+</body>
+</html>

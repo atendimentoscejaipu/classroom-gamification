@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CLASSROOM GAMIFICATION</title>
+<style>
+  :root {
+    --bg-color: #0d2444;
+    --text-color: #fff8ec;
+    --gold: #ffd447;
+    --red: #e63946;
+    --green: #2a9d3f;
+    --blue: #2c5aa0;
+    --pink-icon: #cf0e60;
+    --orange-icon: #f45d22;
+  }
+  
+  body {
+    margin: 0;
+    font-family: 'Trebuchet MS', 'Segoe UI', Verdana, sans-serif;
+    /* IMAGEM ADICIONADA AO PLANO DE FUNDO GERAL */
+    background: url('image_483032.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: var(--text-color);
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--gold);
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    background: rgba(13, 36, 68, 0.85);
+    border-radius: 8px;
+    backdrop-filter: blur(4px);
+  }
+
+  h1 {
+    color: var(--gold);
+    text-shadow: 2px 2px 0 #000;
+    margin: 0;
+  }
+
+  .btn-lixeira {
+    background: var(--red);
+    color: white;
+    border: 2px solid #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  /* CAPA DO APP (HERO BANNER - SEGUNDO QUADRANTE) */
+  .app-cover {
+    width: 100%;
+    height: 220px;
+    background: url('image_483032.jpg') no-repeat center center;
+    background-size: cover;
+    border-radius: 12px;
+    border: 2px solid var(--gold);
+    margin-bottom: 25px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+    box-sizing: border-box;
+  }
+
+  .cover-overlay {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(13, 36, 68, 0.2), rgba(13, 36, 68, 0.9));
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .cover-overlay h2 {
+    color: var(--gold);
+    margin: 0;
+    font-size: 28px;
+    text-shadow: 2px 2px 4px #000;
+    letter-spacing: 1px;
+  }
+
+  .cover-overlay p {
+    color: #fff;
+    margin: 5px 0 0 0;
+    font-size: 15px;
+    text-shadow: 1px 1px 3px #000;
+  }
+
+  /* ESTILOS DA TELA PRINCIPAL (ÍCONES) */
+  .area-section {
+    margin-bottom: 40px;
+    background: rgba(10, 20, 40, 0.75);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--blue);
+    backdrop-filter: blur(4px);
+  }
+
+  .area-title {
+    color: var(--gold);
+    border-left: 5px solid var(--gold);
+    padding-left: 10px;
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 18px;
+  }
+
+  .grid-icones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+  }
+
+  .icone-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 110px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  .icone-wrapper:hover {
+    transform: scale(1.05);
+  }
+
+  .circulo-icone {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 40px;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    margin-bottom: 10px;
+    border: 3px solid rgba(255,255,255,0.2);
+  }
+
+  .icone-titulo {
+    font-size: 13px;
+    font-weight: bold;
+    color: #fff;
+    text-transform: uppercase;
+  }
+
+  /* ESTILOS DA PÁGINA DA DISCIPLINA (INTERNA) */
+  #tela-disciplina {
+    display: none;
+    background: rgba(10, 20, 40, 0.85);
+    border: 2px solid var(--gold);
+    border-radius: 12px;
+    padding: 30px;
+    backdrop-filter: blur(6px);
+  }
+
+  .cabecalho-disciplina {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--blue);
+    padding-bottom: 20px;
+  }
+
+  .btn-voltar {
+    background: var(--blue);
+    color: white;
+    border: 2px solid white;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .acoes-disciplina {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+
+  .btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-add { background: var(--green); }
+  .btn-del { background: var(--red); }
+  .btn-ativo { border: 2px solid white; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+
+  .lista-jogos {
+    background: rgba(13, 36, 68, 0.9);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--blue);
+  }
+
+  /* GRID DE JOGOS COM CAPAS */
+  .grid-jogos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+  }
+
+  .card-jogo {
+    background: rgba(255,255,255,0.05);
+    border: 2px solid var(--blue);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    text-align: center;
+    transition: transform 0.2s;
+  }
+
+  .card-jogo:hover {
+    transform: scale(1.02);
+    border-color: var(--gold);
+  }
+
+  .capa-jogo {
+    width: 100%;
+    height: 120px;
+    background-color: #000;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 40px;
+  }
+
+  .info-jogo {
+    padding: 10px;
+  }
+
+  .info-jogo a {
+    color: var(--gold);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    display: block;
+  }
+
+  .info-jogo a:hover {
+    text-decoration: underline;
+  }
+
+  .checkbox-deletar {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    transform: scale(1.5);
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 0 5px rgba(0,0,0,0.8);
+  }
+
+  /* MODAIS (LIXEIRA E ADICIONAR JOGO) */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-content {
+    background: var(--bg-color);
+    border: 3px solid var(--blue);
+    border-radius: 12px;
+    padding: 20px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .modal-content.lixeira {
+    border-color: var(--red);
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--gold);
+    font-weight: bold;
+  }
+
+  .form-group input, .form-group select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid var(--blue);
+    background: rgba(255,255,255,0.9);
+    color: #000;
+    box-sizing: border-box;
+  }
+
+  .form-group input[type="file"] {
+    background: transparent;
+    color: white;
+    border: none;
+    padding: 5px 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>CLASSROOM GAMIFICATION</h1>
+  <div style="display: flex; gap: 15px; align-items: center;">
+    <button class="btn-lixeira" onclick="abrirLixeira()">LIXEIRA (🗑)</button>
+  </div>
+</header>
+
+<!-- TELA 1: LISTAGEM DE ÁREAS E ÍCONES -->
+<main id="tela-principal"></main>
+
+<!-- TELA 2: PÁGINA INTERNA DA DISCIPLINA -->
+<main id="tela-disciplina">
+  <div class="cabecalho-disciplina">
+    <button class="btn-voltar" onclick="voltarTelaPrincipal()">⬅ VOLTAR</button>
+    <div id="icone-disciplina-atual" class="circulo-icone" style="width: 60px; height: 60px; font-size: 30px;"></div>
+    <h2 id="titulo-disciplina-atual" style="color: var(--gold); margin: 0;"></h2>
+  </div>
+
+  <div class="acoes-disciplina">
+    <button class="btn btn-add" onclick="abrirModalAdicionarJogo()">➕ ADICIONAR JOGO</button>
+    <button class="btn btn-del" id="btn-deletar-jogo" onclick="alternarModoDeletar()">🗑 DELETAR JOGO</button>
+  </div>
+
+  <div class="lista-jogos">
+    <h3 style="margin-top:0;">JOGOS DISPONÍVEIS:</h3>
+    <div id="lista-jogos-container" class="grid-jogos"></div>
+  </div>
+</main>
+
+<!-- MODAL: ADICIONAR JOGO -->
+<div id="modalAdicionarJogo" class="modal-overlay">
+  <div class="modal-content">
+    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #fff; padding-bottom: 10px; margin-bottom: 20px;">
+      <h2 style="color: var(--green); margin: 0;" id="tituloModalAdicionar">ADICIONAR NOVO JOGO</h2>
+      <button onclick="fecharModalAdicionarJogo()" style="background: transparent; color: white; border: 1px solid white; cursor: pointer; border-radius: 4px;">FECHAR [X]</button>
+    </div>
+    
+    <form id="formAdicionarJogo" onsubmit="salvarNovoJogo(event)">
+      <div class="form-group">
+        <label for="nomeJogo">NOME DO JOGO:</label>
+        <input type="text" id="nomeJogo" required placeholder="Ex: Simulado de Redação">
+      </div>
+
+      <div class="form-group">
+        <label for="tipoJogo">TIPO DO JOGO:</label>
+        <select id="tipoJogo" onchange="alternarTipoEntradaJogo()" required>
+          <option value="html_local">Arquivo HTML (Off-line)</option>
+          <option value="link_web">Link da Web</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="grupoArquivoHtml">
+        <label for="arquivoHtmlJogo">SELECIONE O ARQUIVO DO JOGO (.html, .zip):</label>
+        <input type="file" id="arquivoHtmlJogo" accept=".html,.htm,.zip">
+      </div>
+
+      <div class="form-group" id="grupoLinkWeb" style="display: none;">
+        <label for="linkJogo">LINK / URL DO JOGO:</label>
+        <input type="url" id="linkJogo" placeholder="https://...">
+      </div>
+
+      <div class="form-group">
+        <label for="capaJogo">IMAGEM DE CAPA DO JOGO (.jpg, .png) - Opcional:</label>
+        <input type="file" id="capaJogo" accept="image/*">
+        <small style="color: #ccc; display: block; margin-top: 5px;">Se deixado em branco para o ENEM, a arte "0.png" será usada como padrão.</small>
+      </div>
+
+      <button type="submit" class="btn btn-add" style="width: 100%; justify-content: center; font-size: 16px; margin-top: 10px;">💾 SALVAR JOGO</button>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: LIXEIRA -->
+<div id="lixeiraModal" class="modal-overlay">
+  <div class="modal-content lixeira">
+    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #fff; padding-bottom: 10px; margin-bottom: 20px;">
+      <h2 style="color: var(--red); margin: 0;">LIXEIRA</h2>
+      <button onclick="fecharLixeira()" style="background: transparent; color: white; border: 1px solid white; cursor: pointer; border-radius: 4px;">FECHAR [X]</button>
+    </div>
+    <p style="color: #ff9aa2; font-size: 14px; text-align: center;">JOGOS EXCLUÍDOS FICARÃO AQUI POR 30 DIAS.</p>
+    <div id="container-lixeira"></div>
+  </div>
+</div>
+
+<script>
+// BASE DE DADOS
+let disciplinas = [
+  { id: 999, area: "EXAME NACIONAL DO ENSINO MÉDIO", nome: "JOGOS ENEM", icone: "📝", cor: "var(--gold)", jogos: [] },
+  { id: 1, area: "LINGUAGENS E SUAS TECNOLOGIAS", nome: "LÍNGUA PORTUGUESA", icone: "💬", cor: "var(--pink-icon)", jogos: [
+      { id: 101, nome: "SUPER FL WORLD V3", url: "superflworldv3.html", capa: "", excluido: false }
+  ]},
+  { id: 2, area: "LINGUAGENS E SUAS TECNOLOGIAS", nome: "ARTE", icone: "🎨", cor: "var(--pink-icon)", jogos: [] },
+  { id: 3, area: "LINGUAGENS E SUAS TECNOLOGIAS", nome: "EDUCAÇÃO FÍSICA", icone: "🏃", cor: "var(--pink-icon)", jogos: [] },
+  { id: 4, area: "LINGUAGENS E SUAS TECNOLOGIAS", nome: "LÍNGUA INGLESA", icone: "🌐", cor: "var(--pink-icon)", jogos: [] },
+  { id: 5, area: "LINGUAGENS E SUAS TECNOLOGIAS", nome: "LÍNGUA ESPANHOLA", icone: "🌎", cor: "var(--pink-icon)", jogos: [] },
+  { id: 6, area: "MATEMÁTICA E SUAS TECNOLOGIAS", nome: "MATEMÁTICA", icone: "📐", cor: "var(--blue)", jogos: [] },
+  { id: 7, area: "CIÊNCIAS DA NATUREZA E SUAS TECNOLOGIAS", nome: "BIOLOGIA", icone: "🌿", cor: "var(--orange-icon)", jogos: [] },
+  { id: 8, area: "CIÊNCIAS DA NATUREZA E SUAS TECNOLOGIAS", nome: "FÍSICA", icone: "⚛️", cor: "var(--orange-icon)", jogos: [] },
+  { id: 9, area: "CIÊNCIAS DA NATUREZA E SUAS TECNOLOGIAS", nome: "QUÍMICA", icone: "🧪", cor: "var(--orange-icon)", jogos: [] },
+  { id: 10, area: "CIÊNCIAS HUMANAS E SOCIAIS APLICADAS", nome: "HISTÓRIA", icone: "📜", cor: "var(--orange-icon)", jogos: [] },
+  { id: 11, area: "CIÊNCIAS HUMANAS E SOCIAIS APLICADAS", nome: "GEOGRAFIA", icone: "🌍", cor: "var(--orange-icon)", jogos: [] },
+  { id: 12, area: "CIÊNCIAS HUMANAS E SOCIAIS APLICADAS", nome: "FILOSOFIA", icone: "🏛️", cor: "var(--orange-icon)", jogos: [] },
+  { id: 13, area: "CIÊNCIAS HUMANAS E SOCIAIS APLICADAS", nome: "SOCIOLOGIA", icone: "👥", cor: "var(--orange-icon)", jogos: [] }
+];
+
+let disciplinaAtualId = null;
+let modoDeletarAtivo = false;
+
+// INICIALIZA A TELA PRINCIPAL
+function renderizarTelaPrincipal() {
+  const container = document.getElementById('tela-principal');
+  
+  // CAPA PRINCIPAL DO APP NO TOPO (SEGUNDO QUADRANTE)
+  let htmlContent = `
+    <div class="app-cover">
+      <div class="cover-overlay">
+        <h2>CLASSROOM GAMIFICATION</h2>
+        <p>Plataforma Interativa de Jogos Educacionais</p>
+      </div>
+    </div>
+  `;
+
+  const areas = [...new Set(disciplinas.map(d => d.area))];
+
+  areas.forEach(area => {
+    const disciplinasArea = disciplinas.filter(d => d.area === area);
+    if(disciplinasArea.length > 0) {
+      htmlContent += `
+        <div class="area-section">
+          <h2 class="area-title">${area}</h2>
+          <div class="grid-icones">
+            ${disciplinasArea.map(d => `
+              <div class="icone-wrapper" onclick="abrirDisciplina(${d.id})">
+                <div class="circulo-icone" style="background-color: ${d.cor};">${d.icone}</div>
+                <div class="icone-titulo">${d.nome}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+  });
+
+  container.innerHTML = htmlContent;
+  renderizarLixeira();
+}
+
+// NAVEGAÇÃO
+function abrirDisciplina(id) {
+  const disciplina = disciplinas.find(d => d.id === id);
+  if(!disciplina) return;
+  disciplinaAtualId = id;
+  modoDeletarAtivo = false;
+  document.getElementById('btn-deletar-jogo').classList.remove('btn-ativo');
+  
+  document.getElementById('titulo-disciplina-atual').innerText = disciplina.nome;
+  const iconeElement = document.getElementById('icone-disciplina-atual');
+  iconeElement.innerText = disciplina.icone;
+  iconeElement.style.backgroundColor = disciplina.cor;
+
+  renderizarJogos();
+
+  document.getElementById('tela-principal').style.display = 'none';
+  document.getElementById('tela-disciplina').style.display = 'block';
+}
+
+function voltarTelaPrincipal() {
+  disciplinaAtualId = null;
+  document.getElementById('tela-disciplina').style.display = 'none';
+  document.getElementById('tela-principal').style.display = 'block';
+}
+
+// RENDERIZAR JOGOS COM CAPAS
+function renderizarJogos() {
+  const containerJogos = document.getElementById('lista-jogos-container');
+  containerJogos.innerHTML = '';
+  
+  const disciplina = disciplinas.find(d => d.id === disciplinaAtualId);
+  const jogosAtivos = disciplina.jogos.filter(j => !j.excluido);
+
+  if (jogosAtivos.length === 0) {
+    containerJogos.style.display = "block";
+    containerJogos.innerHTML = '<p style="color: gray;">NENHUM JOGO CADASTRADO NESSA DISCIPLINA.</p>';
+    return;
+  }
+
+  containerJogos.style.display = "grid";
+
+  jogosAtivos.forEach(jogo => {
+    const card = document.createElement('div');
+    card.className = 'card-jogo';
+
+    let checkbox = '';
+    if (modoDeletarAtivo) {
+      checkbox = `<input type="checkbox" class="checkbox-deletar" onchange="confirmarDelecaoJogo(event, ${jogo.id})">`;
+    }
+
+    let estiloCapa = jogo.capa ? `background-image: url('${jogo.capa}');` : ``;
+    let conteudoCapa = jogo.capa ? `` : `🎮`;
+
+    card.innerHTML = `
+      ${checkbox}
+      <a href="${jogo.url}" target="_blank" style="text-decoration: none; color: inherit; display: block;">
+        <div class="capa-jogo" style="${estiloCapa}">${conteudoCapa}</div>
+      </a>
+      <div class="info-jogo">
+        <a href="${jogo.url}" target="_blank">${jogo.nome}</a>
+      </div>
+    `;
+    containerJogos.appendChild(card);
+  });
+}
+
+function alternarModoDeletar() {
+  modoDeletarAtivo = !modoDeletarAtivo;
+  const btn = document.getElementById('btn-deletar-jogo');
+  if (modoDeletarAtivo) { btn.classList.add('btn-ativo'); } else { btn.classList.remove('btn-ativo'); }
+  renderizarJogos();
+}
+
+function confirmarDelecaoJogo(event, jogoId) {
+  if (event.target.checked) {
+    if (confirm("Você deseja realmente deletar esse jogo?")) {
+      const disciplina = disciplinas.find(d => d.id === disciplinaAtualId);
+      const jogo = disciplina.jogos.find(j => j.id === jogoId);
+      jogo.excluido = true;
+      renderizarJogos();
+      renderizarLixeira();
+    } else {
+      event.target.checked = false;
+    }
+  }
+}
+
+// ADICIONAR JOGOS
+function abrirModalAdicionarJogo() {
+  document.getElementById('modalAdicionarJogo').style.display = 'flex';
+  document.getElementById('formAdicionarJogo').reset();
+  document.getElementById('tituloModalAdicionar').innerText = "ADICIONAR NOVO JOGO";
+  alternarTipoEntradaJogo();
+}
+
+function fecharModalAdicionarJogo() {
+  document.getElementById('modalAdicionarJogo').style.display = 'none';
+}
+
+function alternarTipoEntradaJogo() {
+  const tipo = document.getElementById('tipoJogo').value;
+  if (tipo === 'html_local') {
+    document.getElementById('grupoArquivoHtml').style.display = 'block';
+    document.getElementById('arquivoHtmlJogo').required = true;
+    document.getElementById('grupoLinkWeb').style.display = 'none';
+    document.getElementById('linkJogo').required = false;
+  } else {
+    document.getElementById('grupoArquivoHtml').style.display = 'none';
+    document.getElementById('arquivoHtmlJogo').required = false;
+    document.getElementById('grupoLinkWeb').style.display = 'block';
+    document.getElementById('linkJogo').required = true;
+  }
+}
+
+function salvarNovoJogo(event) {
+  event.preventDefault();
+
+  const nome = document.getElementById('nomeJogo').value.toUpperCase();
+  const tipo = document.getElementById('tipoJogo').value;
+  
+  let arquivoUrl = "#";
+  if (tipo === 'html_local') {
+    const file = document.getElementById('arquivoHtmlJogo').files[0];
+    if (file) { arquivoUrl = URL.createObjectURL(file); } 
+  } else {
+    arquivoUrl = document.getElementById('linkJogo').value;
+  }
+
+  const arquivoCapa = document.getElementById('capaJogo').files[0];
+  let capaUrl = "";
+  if (arquivoCapa) {
+    capaUrl = URL.createObjectURL(arquivoCapa);
+  } else if (disciplinaAtualId === 999) {
+    capaUrl = "0.png";
+  }
+
+  const disciplina = disciplinas.find(d => d.id === disciplinaAtualId);
+  const novoId = Date.now(); 
+  
+  disciplina.jogos.push({
+    id: novoId,
+    nome: nome,
+    url: arquivoUrl,
+    capa: capaUrl,
+    excluido: false
+  });
+
+  fecharModalAdicionarJogo();
+  abrirDisciplina(disciplinaAtualId);
+  alert("Jogo cadastrado com sucesso!");
+}
+
+// LIXEIRA
+function renderizarLixeira() {
+  const containerLixeira = document.getElementById('container-lixeira');
+  containerLixeira.innerHTML = '';
+  let jogosExcluidos = [];
+  
+  disciplinas.forEach(d => {
+    d.jogos.forEach(j => {
+      if (j.excluido) { jogosExcluidos.push({ disciplinaId: d.id, disciplinaNome: d.nome, jogo: j }); }
+    });
+  });
+  
+  if (jogosExcluidos.length === 0) {
+    containerLixeira.innerHTML = '<p style="text-align:center; width:100%;">A LIXEIRA ESTÁ VAZIA.</p>';
+    return;
+  }
+
+  jogosExcluidos.forEach(item => {
+    const div = document.createElement('div');
+    div.style = "display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px; margin-bottom: 10px;";
+    div.innerHTML = `
+      <div>
+        <strong style="color: white; font-size: 16px;">🎮 ${item.jogo.nome}</strong><br>
+        <span style="color: gray; font-size: 12px;">CATEGORIA: ${item.disciplinaNome}</span>
+      </div>
+      <button class="btn btn-add" onclick="reativarJogo(${item.disciplinaId}, ${item.jogo.id})">REATIVAR</button>
+    `;
+    containerLixeira.appendChild(div);
+  });
+}
+
+function reativarJogo(disciplinaId, jogoId) {
+  const disciplina = disciplinas.find(d => d.id === disciplinaId);
+  const jogo = disciplina.jogos.find(j => j.id === jogoId);
+  if (jogo) {
+    jogo.excluido = false;
+    renderizarLixeira();
+    if (disciplinaAtualId === disciplinaId && document.getElementById('tela-disciplina').style.display === 'block') {
+      renderizarJogos();
+    }
+  }
+}
+
+function abrirLixeira() { document.getElementById('lixeiraModal').style.display = 'flex'; }
+function fecharLixeira() { document.getElementById('lixeiraModal').style.display = 'none'; }
+
+// INICIA
+window.onload = renderizarTelaPrincipal;
+</script>
+</body>
+</html>
