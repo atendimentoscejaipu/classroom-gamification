@@ -1,0 +1,17 @@
+{
+  "name": "Classroom Gamification",
+  "short_name": "Gamification",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0d2444",
+  "theme_color": "#0d2444",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "SUPERFLWORD.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
