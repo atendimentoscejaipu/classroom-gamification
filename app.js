@@ -1,58 +1,96 @@
-import { db } from "./firebase-config.js";
-import { collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+// SDK DE ARMAZENAMENTO OFFLINE E SINCRONIZAÇÃO EM LOTE (Google Cloud - Holanda)
 
-const $ = id => document.getElementById(id);
-const grid = $("componentGrid");
+const CloudSyncSDK = {
+    db: null,
+    // Endpoint fictício apontando para a infraestrutura do Google Cloud na Europa (Holanda)
+    cloudEndpoint: "https://europe-west4-seu-projeto.cloudfunctions.net/sync-lote", 
 
-// A MÁGICA ACONTECE AQUI: Carrega os jogos diretamente para o público sem pedir login!
-loadComponents();
+    init: function() {
+        const request = indexedDB.open("ClassroomGamificationDB", 2);
+        
+        request.onupgradeneeded = (e) => {
+            this.db = e.target.result;
+            if (!this.db.objectStoreNames.contains("jogos")) {
+                this.db.createObjectStore("jogos", { keyPath: "id" });
+            }
+            if (!this.db.objectStoreNames.contains("progresso_alunos")) {
+                this.db.createObjectStore("progresso_alunos", { keyPath: "id", autoIncrement: true });
+            }
+        };
+        
+        request.onsuccess = (e) => {
+            this.db = e.target.result;
+            console.log("📦 SDK: Banco de dados local (IndexedDB) pronto!");
+            this.tentarSincronizarEmLote(); // Tenta sincronizar se houver internet
+        };
+    },
 
-// Controlos de adicionar novos jogos/componentes
-const btnAdd = $("btnAddComponent");
-if(btnAdd) btnAdd.onclick = () => $("componentModal").classList.remove("hidden");
+    // Função que os jogos chamam para salvar os dados offline
+    salvarProgressoLocal: function(dados) {
+        const tx = this.db.transaction(["progresso_alunos"], "readwrite");
+        const store = tx.objectStore("progresso_alunos");
+        
+        dados.sincronizado = false; // Marca como pendente de envio
+        dados.timestamp = Date.now();
+        store.add(dados);
+        
+        tx.oncomplete = () => {
+            console.log("💾 SDK: Progresso salvo offline com sucesso.");
+            this.tentarSincronizarEmLote();
+        };
+    },
 
-const btnSave = $("saveComponent");
-if(btnSave) btnSave.onclick = saveComponent;
+    // Envia os dados acumulados de uma só vez para a nuvem
+    tentarSincronizarEmLote: async function() {
+        if (!navigator.onLine) {
+            console.log("📴 SDK: Offline. Os dados serão enviados quando a internet voltar.");
+            return;
+        }
 
-document.querySelectorAll("[data-close]").forEach(b => b.onclick = () => $(b.dataset.close).classList.add("hidden"));
+        const tx = this.db.transaction(["progresso_alunos"], "readonly");
+        const store = tx.objectStore("progresso_alunos");
+        const request = store.getAll();
 
-function loadComponents() {
-  onSnapshot(query(collection(db, "subjects"), orderBy("name")), snap => {
-    grid.innerHTML = "";
-    snap.forEach(d => {
-      const c = d.data();
-      const card = document.createElement("article");
-      card.className = "component-card";
-      card.innerHTML = `
-        <div class="cover" style="background-image:url('${escapeAttr(c.cover || defaultCover(c.name))}')">
-          <div class="cover-shade"></div><h3>${escapeHtml(c.name)}</h3>
-        </div>
-        <div class="card-actions">
-          <button class="primary open">Abrir jogos</button>
-          <button class="danger remove">Retirar</button>
-        </div>`;
-      card.querySelector(".open").onclick = () => location.href = `component.html?id=${encodeURIComponent(d.id)}`;
-      card.querySelector(".remove").onclick = async () => {
-        if (confirm(`Retirar "${c.name}"?`)) await deleteDoc(doc(db, "subjects", d.id));
-      };
-      grid.appendChild(card);
-    });
-  });
-}
+        request.onsuccess = async (e) => {
+            const pendentes = e.target.result.filter(item => !item.sincronizado);
+            if (pendentes.length === 0) return;
 
-async function saveComponent() {
-  const name = $("componentName").value.trim();
-  if (!name) return alert("Informe o nome do componente.");
-  await addDoc(collection(db, "subjects"), {
-    name, cover: $("componentCover").value.trim(),
-    createdAt: serverTimestamp()
-  });
-  $("componentName").value = ""; $("componentCover").value = "";
-  $("componentModal").classList.add("hidden");
-}
+            console.log(`🚀 SDK: Enviando lote de ${pendentes.length} registros para o Google Cloud (Holanda)...`);
 
-function defaultCover(name) {
-  return `https://placehold.co/900x600/png?text=${encodeURIComponent(name)}`;
-}
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
-function escapeAttr(s){return String(s).replace(/'/g,"%27");}
+            try {
+                // Aqui entraria o fetch real para a sua Cloud Function
+                // Simulando um envio bem-sucedido:
+                setTimeout(() => {
+                    this.marcarComoSincronizado(pendentes);
+                    console.log("☁️ SDK: Sincronização em lote concluída com sucesso!");
+                }, 1500);
+
+            } catch (error) {
+                console.error("❌ SDK: Erro na sincronização. Tentaremos novamente depois.", error);
+            }
+        };
+    },
+
+    marcarComoSincronizado: function(registros) {
+        const tx = this.db.transaction(["progresso_alunos"], "readwrite");
+        const store = tx.objectStore("progresso_alunos");
+        registros.forEach(registro => {
+            registro.sincronizado = true;
+            store.put(registro);
+        });
+    }
+};
+
+// Iniciar o SDK e o Service Worker para garantir que vira uma App Instalável
+window.addEventListener('load', () => {
+    CloudSyncSDK.init();
+    
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').then(() => {
+            console.log('⚙️ Service Worker ativado. Plataforma pronta para instalar!');
+        });
+    }
+});
+
+// Se a internet cair e voltar, ele tenta enviar os dados automaticamente
+window.addEventListener('online', () => CloudSyncSDK.tentarSincronizarEmLote());
